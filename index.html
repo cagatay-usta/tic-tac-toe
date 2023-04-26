@@ -6,8 +6,31 @@
     <title>Tic Tac Toe</title>
     <script defer src="./game.js" type="module"></script>
     <link rel="stylesheet" href="src/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Margarine&display=swap" rel="stylesheet">
+
   </head>
-  <body>
-      <h1 class="text-center">hello world</h1>
+  <body class="bg-support">
+
+
+    <div class="game-container h-screen flex flex-col gap-20 justify-center items-center">
+      <div class="scores flex justify-around w-screen text-primary">
+        <div class="score text-5xl">X = <span class="x-score">1</span></div>
+        <div class="score text-5xl">O = <span class="o-score">2</span></div>
+      </div>
+      <div class="board grid grid-cols-3 grid-rows-3 gap-4">
+        <div class="cell"><span class="symbol">X</span></div>
+        <div class="cell"><span class="symbol">O</span></div>
+        <div class="cell"><span class="symbol">X</span></div>
+        <div class="cell"><span class="symbol">O</span></div>
+        <div class="cell"><span class="symbol">X</span></div>
+        <div class="cell"><span class="symbol">O</span></div>
+        <div class="cell"><span class="symbol"> </span></div>
+        <div class="cell"><span class="symbol"> </span></div>
+        <div class="cell"><span class="symbol">X</span></div>
+      </div>
+      <button class="giveup-btn text-6xl text-primary">Give Up</button>
+    </div>
   </body>
 </html>

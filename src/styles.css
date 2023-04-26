@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    
+    .cell {
+        @apply bg-primary p-6 rounded-xl w-20 h-20 grid items-center justify-center content-center
+        lg:w-36 lg:h-36
+        cursor-pointer
+    }
+    .symbol {
+        @apply text-white text-5xl lg:text-8xl
+    }
+}
+
+* {
+    font-family: 'Margarine', cursive;
+    user-select: none;
+}

@@ -175,4 +175,4 @@ const game = (() => {
   return { startGame };
 })();
 
-game.startGame();
+// game.startGame();
