@@ -16,11 +16,27 @@ const board = (() => {
     state[input[0]][input[1]] = symbol;
   };
 
+  const checkValidMove = (input) => {
+    if (!input) return false;
+    input = input.split("/");
+    if (input.length !== 2) return false;
+    if (
+      +input[0] > 2 ||
+      +input[0] < 0 ||
+      +input[1] > 2 ||
+      +input[1] < 0
+    )
+      return false;
+    return state[input[0]][input[1]] === " " ? true : false;
+  };
+
   // check if the board is either filled or there is 3-in-a-row. return "X" or "O" for win, "draw", or 0 for "not finished"
   const noLegalMoves = () => {
-    for (let s = 0; s < 2; s++) {
+    let s;
+    for (let i = 0; i < 2; i++) {
       // check both X and O
-      s = s === 0 ? "X" : "O";
+      if (i == 0) s = "O";
+      if (i == 1) s = "X";
 
       // check diagonal
       if (
@@ -54,7 +70,13 @@ const board = (() => {
     return state.flat().includes(" ") ? 0 : "draw";
   };
 
-  return { drawBoard, clearBoard, noLegalMoves, updateState };
+  return {
+    drawBoard,
+    clearBoard,
+    checkValidMove,
+    noLegalMoves,
+    updateState,
+  };
 })();
 
 const UI = (() => {
@@ -64,9 +86,12 @@ const UI = (() => {
   };
 
   const getPlayerInput = (symbol) => {
-    let answer = prompt(
-      `place your ${symbol}, 0/0 for first cell, 2/2 for last`
-    );
+    let answer;
+    do {
+      answer = prompt(
+        `place your ${symbol}, 0/0 for first cell, 2/2 for last`
+      );
+    } while (!board.checkValidMove(answer));
     return answer;
   };
 
@@ -75,13 +100,13 @@ const UI = (() => {
 
 const player = (() => {
   let playerCount = 0;
-  let name = "Player";
+  let name = "Player One";
 
   // factory function that creates player object depending on the options provided by the player
   const createPlayer = (symbol) => {
     if (playerCount === 1) {
       symbol = symbol === "X" ? "O" : "X";
-      name = "Computer";
+      name = "Player Two";
     }
     const order = symbol === "X" ? 0 : 1; // 0 goes first, 1 goes second
     playerCount++;
@@ -104,19 +129,33 @@ const game = (() => {
     board.clearBoard();
     while (!board.noLegalMoves()) {
       console.clear();
+      // DEBUG
+      console.log(players[0].wins);
+      console.log(players[1].wins);
+      // DEBUG END
       board.drawBoard();
       let input = UI.getPlayerInput(players[playOrder].symbol);
       board.updateState(input, players[playOrder].symbol);
       playOrder = playOrder === 0 ? 1 : 0;
     }
+    const result = board.noLegalMoves();
+    console.clear();
     board.drawBoard();
-    console.log(`${board.noLegalMoves()} wins`);
+    result === players[0].symbol ? players[0].wins++ : players[1].wins++;
   };
 
   const startGame = () => {
+    // DEBUG
+    if (!prompt("start?")) return;
+    // DEBUG END
     const options = UI.askPlayerOptions();
     const players = player.createPlayers(options);
-    playRound(players);
+    do {
+      playRound(players);
+    } while (players[0].wins !== 1 && players[1].wins !== 1);
+    players[0].wins > players[1].wins
+      ? console.log(`${players[0].name} wins`)
+      : console.log(`${players[1].name} wins`);
   };
 
   return { startGame };
