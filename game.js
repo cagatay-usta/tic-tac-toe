@@ -81,16 +81,20 @@ const board = (() => {
 
 const UI = (() => {
   const askPlayerOptions = () => {
-    const options = "X"; // prompt("pick your symbol, X goes first (X/O)", "X");
+    const options = ["X", "Bot"]; // prompt("pick your symbol, X goes first (X/O)", "X") // human or bot?;
     return options;
   };
 
-  const getPlayerInput = (symbol) => {
+  const getPlayerInput = (players) => {
     let answer;
     do {
-      answer = prompt(
-        `place your ${symbol}, 0/0 for first cell, 2/2 for last`
-      );
+      if (players.name === "Bot") {
+        answer = player.easyAI();
+      } else {
+        answer = prompt(
+          `place your ${players.symbol}, 0/0 for first cell, 2/2 for last`
+        );
+      }
     } while (!board.checkValidMove(answer));
     return answer;
   };
@@ -103,10 +107,11 @@ const player = (() => {
   let name = "Player One";
 
   // factory function that creates player object depending on the options provided by the player
-  const createPlayer = (symbol) => {
+  const createPlayer = (options) => {
+    let symbol = options[0];
     if (playerCount === 1) {
-      symbol = symbol === "X" ? "O" : "X";
-      name = "Player Two";
+      symbol = options[0] === "X" ? "O" : "X";
+      options[1] === "human" ? (name = "Player Two") : (name = "Bot");
     }
     const order = symbol === "X" ? 0 : 1; // 0 goes first, 1 goes second
     playerCount++;
@@ -120,7 +125,14 @@ const player = (() => {
     return [playerOne, playerTwo]; // returns a list of objects
   };
 
-  return { createPlayers };
+  // returns a random human-like input
+  const easyAI = () => {
+    let row = Math.floor(Math.random() * 3);
+    let col = Math.floor(Math.random() * 3);
+    return `${row}/${col}`;
+  };
+
+  return { createPlayers, easyAI };
 })();
 
 const game = (() => {
@@ -134,14 +146,16 @@ const game = (() => {
       console.log(players[1].wins);
       // DEBUG END
       board.drawBoard();
-      let input = UI.getPlayerInput(players[playOrder].symbol);
+      let input = UI.getPlayerInput(players[playOrder]);
       board.updateState(input, players[playOrder].symbol);
       playOrder = playOrder === 0 ? 1 : 0;
     }
     const result = board.noLegalMoves();
     console.clear();
     board.drawBoard();
-    result === players[0].symbol ? players[0].wins++ : players[1].wins++;
+    result === players[0].symbol
+      ? players[0].wins++
+      : players[1].wins++;
   };
 
   const startGame = () => {
