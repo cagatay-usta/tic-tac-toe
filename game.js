@@ -15,13 +15,14 @@ const board = (() => {
     state = state.map((r) => [" ", " ", " "]);
   };
   const updateState = (input, symbol) => {
-    input = input.split("/");
+    if (input.length !== "2") {
+      input = input.split("/");
+    }
     state[input[0]][input[1]] = symbol;
   };
 
   const checkValidMove = (input) => {
     if (!input) return false;
-    console.log(input);
     input = input.split("/");
     if (input.length !== 2) return false;
     if (
@@ -95,8 +96,7 @@ const UI = (() => {
       do {
         answer = player.easyAI();
       } while (!board.checkValidMove(answer));
-    } else {
-      if (board.checkValidMove(answer)) return answer
+      return answer;
     }
   };
 
@@ -137,29 +137,36 @@ const player = (() => {
 })();
 
 const game = (() => {
-  const playRound = (players, e) => {
-    let playOrder = players[0].order;
-    
-    if (!board.noLegalMoves()) {
-      // DEBUG
-      console.log(players[0].wins);
-      console.log(players[1].wins);
-      // DEBUG END
-      // REFACTOR HERE WITH ASSUMED PLAYER INPUT AND ONLY TAKE THE BOTS INPUT WITH GETPLAYERINPUT FUNCTION
-      let input = UI.getPlayerInput(players[playOrder], e);
-      board.updateState(input, players[playOrder].symbol);
-      board.drawBoard();
-      playOrder = playOrder === 0 ? 1 : 0;
-    } else {
+  const endRound = (players) => {
     const result = board.noLegalMoves();
-    console.clear();
     board.drawBoard();
     if (result === "draw") return;
     result === players[0].symbol
       ? players[0].wins++
       : players[1].wins++;
-    }
+
+    console.table(players);
   };
+
+  const playRound = (players, e) => {
+    // check if player move is valid
+    if (!board.checkValidMove(e.target.dataset.cellid)) return false;
+      let playerInput = e.target.dataset.cellid;
+      board.updateState(playerInput, players[0].symbol);
+      board.drawBoard();
+      // check if the game is over after each move
+      if (board.noLegalMoves()) {
+        endRound(players);
+        return
+      }
+      let robotInput = UI.getPlayerInput(players[1], e);
+      board.updateState(robotInput, players[1].symbol);
+      setTimeout(board.drawBoard, 1000);
+
+      if (board.noLegalMoves()) {
+        endRound(players);
+      }
+    }
 
   const startGame = () => {
     // DEBUG
@@ -169,18 +176,18 @@ const game = (() => {
     const players = player.createPlayers(options);
     board.clearBoard();
     board.drawBoard();
-      const clickHandler = (e) => {
-        playRound(players, e);
-      };
-      const cells = document.querySelectorAll(".cell");
-      cells.forEach((cell) => {
-        cell.addEventListener("click", clickHandler);
-      });
-      
+    const clickHandler = (e) => {
+      playRound(players, e);
+    };
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
+      cell.addEventListener("click", clickHandler);
+    });
+
     if (players[0].wins === 1 || players[1].wins === 1) {
-    players[0].wins > players[1].wins
-      ? console.log(`${players[0].name} wins`)
-      : console.log(`${players[1].name} wins`);
+      players[0].wins > players[1].wins
+        ? console.log(`${players[0].name} wins`)
+        : console.log(`${players[1].name} wins`);
     }
   };
 
