@@ -146,27 +146,37 @@ const game = (() => {
       : players[1].wins++;
 
     console.table(players);
+
+    // check if the win conditions met to end the game
+    if (players[0].wins === 2 || players[1].wins === 2) {
+      players[0].wins > players[1].wins
+        ? console.log(`${players[0].name} wins`)
+        : console.log(`${players[1].name} wins`);
+    } else {
+      // else restart the game preserving wins stored in player objects
+      game.startGame();
+    }
   };
 
   const playRound = (players, e) => {
     // check if player move is valid
     if (!board.checkValidMove(e.target.dataset.cellid)) return false;
-      let playerInput = e.target.dataset.cellid;
-      board.updateState(playerInput, players[0].symbol);
-      board.drawBoard();
-      // check if the game is over after each move
-      if (board.noLegalMoves()) {
-        endRound(players);
-        return
-      }
-      let robotInput = UI.getPlayerInput(players[1], e);
-      board.updateState(robotInput, players[1].symbol);
-      setTimeout(board.drawBoard, 1000);
-
-      if (board.noLegalMoves()) {
-        endRound(players);
-      }
+    let playerInput = e.target.dataset.cellid;
+    board.updateState(playerInput, players[0].symbol);
+    board.drawBoard();
+    // check if the game is over after each move
+    if (board.noLegalMoves()) {
+      endRound(players);
+      return;
     }
+    let robotInput = UI.getPlayerInput(players[1], e);
+    board.updateState(robotInput, players[1].symbol);
+    setTimeout(board.drawBoard, 1000);
+
+    if (board.noLegalMoves()) {
+      endRound(players);
+    }
+  };
 
   const startGame = () => {
     // DEBUG
@@ -183,12 +193,6 @@ const game = (() => {
     cells.forEach((cell) => {
       cell.addEventListener("click", clickHandler);
     });
-
-    if (players[0].wins === 1 || players[1].wins === 1) {
-      players[0].wins > players[1].wins
-        ? console.log(`${players[0].name} wins`)
-        : console.log(`${players[1].name} wins`);
-    }
   };
 
   return { startGame };
