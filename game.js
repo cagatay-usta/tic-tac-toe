@@ -6,7 +6,10 @@ const board = (() => {
   ];
 
   const drawBoard = () => {
-    console.table(state);
+    const flatState = state.flat();
+    for (let i = 0; i < flatState.length; i++) {
+      document.getElementById(i).innerHTML = flatState[i];
+    }
   };
   const clearBoard = () => {
     state = state.map((r) => [" ", " ", " "]);
@@ -18,6 +21,7 @@ const board = (() => {
 
   const checkValidMove = (input) => {
     if (!input) return false;
+    console.log(input);
     input = input.split("/");
     if (input.length !== 2) return false;
     if (
@@ -85,18 +89,15 @@ const UI = (() => {
     return options;
   };
 
-  const getPlayerInput = (players) => {
-    let answer;
-    do {
-      if (players.name === "Bot") {
+  const getPlayerInput = (players, e) => {
+    let answer = e.target.dataset.cellid;
+    if (players.name === "Bot") {
+      do {
         answer = player.easyAI();
-      } else {
-        answer = prompt(
-          `place your ${players.symbol}, 0/0 for first cell, 2/2 for last`
-        );
-      }
-    } while (!board.checkValidMove(answer));
-    return answer;
+      } while (!board.checkValidMove(answer));
+    } else {
+      if (board.checkValidMove(answer)) return answer
+    }
   };
 
   return { askPlayerOptions, getPlayerInput };
@@ -136,26 +137,28 @@ const player = (() => {
 })();
 
 const game = (() => {
-  const playRound = (players) => {
+  const playRound = (players, e) => {
     let playOrder = players[0].order;
-    board.clearBoard();
-    while (!board.noLegalMoves()) {
-      console.clear();
+    
+    if (!board.noLegalMoves()) {
       // DEBUG
       console.log(players[0].wins);
       console.log(players[1].wins);
       // DEBUG END
-      board.drawBoard();
-      let input = UI.getPlayerInput(players[playOrder]);
+      // REFACTOR HERE WITH ASSUMED PLAYER INPUT AND ONLY TAKE THE BOTS INPUT WITH GETPLAYERINPUT FUNCTION
+      let input = UI.getPlayerInput(players[playOrder], e);
       board.updateState(input, players[playOrder].symbol);
+      board.drawBoard();
       playOrder = playOrder === 0 ? 1 : 0;
-    }
+    } else {
     const result = board.noLegalMoves();
     console.clear();
     board.drawBoard();
+    if (result === "draw") return;
     result === players[0].symbol
       ? players[0].wins++
       : players[1].wins++;
+    }
   };
 
   const startGame = () => {
@@ -164,15 +167,24 @@ const game = (() => {
     // DEBUG END
     const options = UI.askPlayerOptions();
     const players = player.createPlayers(options);
-    do {
-      playRound(players);
-    } while (players[0].wins !== 1 && players[1].wins !== 1);
+    board.clearBoard();
+    board.drawBoard();
+      const clickHandler = (e) => {
+        playRound(players, e);
+      };
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach((cell) => {
+        cell.addEventListener("click", clickHandler);
+      });
+      
+    if (players[0].wins === 1 || players[1].wins === 1) {
     players[0].wins > players[1].wins
       ? console.log(`${players[0].name} wins`)
       : console.log(`${players[1].name} wins`);
+    }
   };
 
   return { startGame };
 })();
 
-// game.startGame();
+game.startGame();
