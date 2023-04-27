@@ -99,8 +99,22 @@ const UI = (() => {
       return answer;
     }
   };
+  
+  const updateScores = (players) => {
+    const xScore = document.querySelector(".x-score");
+    const oScore = document.querySelector(".o-score");
+    if (players[0].symbol === "X") {
+      xScore.innerHTML = players[0].wins;
+      oScore.innerHTML = players[1].wins;
+      return;
+    } else {
+      xScore.innerHTML = players[1].wins;
+      oScore.innerHTML = players[0].wins;
+    }
+  };
+  // const DisplayWinScreen
 
-  return { askPlayerOptions, getPlayerInput };
+  return { askPlayerOptions, getPlayerInput, updateScores };
 })();
 
 const player = (() => {
@@ -152,9 +166,10 @@ const game = (() => {
       players[0].wins > players[1].wins
         ? console.log(`${players[0].name} wins`)
         : console.log(`${players[1].name} wins`);
+      UI.updateScores(players);
     } else {
       // else restart the game preserving wins stored in player objects
-      game.startGame();
+      game.startGame(options, players);
     }
   };
 
@@ -178,13 +193,9 @@ const game = (() => {
     }
   };
 
-  const startGame = () => {
-    // DEBUG
-    if (!prompt("start?")) return;
-    // DEBUG END
-    const options = UI.askPlayerOptions();
-    const players = player.createPlayers(options);
+  const startGame = (options, players) => {
     board.clearBoard();
+    UI.updateScores(players);
     board.drawBoard();
     const clickHandler = (e) => {
       playRound(players, e);
@@ -198,4 +209,6 @@ const game = (() => {
   return { startGame };
 })();
 
-game.startGame();
+const options = UI.askPlayerOptions();
+const players = player.createPlayers(options);
+game.startGame(options, players);
