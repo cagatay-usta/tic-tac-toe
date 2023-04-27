@@ -85,9 +85,52 @@ const board = (() => {
 })();
 
 const UI = (() => {
-  const askPlayerOptions = () => {
-    const options = ["X", "Bot"]; // prompt("pick your symbol, X goes first (X/O)", "X") // human or bot?;
-    return options;
+  const gameContainer = document.querySelector(".game-container");
+  const homeScreen = document.querySelector(".home");
+  const winScreen = document.querySelector(".win-screen");
+
+  const displayHome = (restart) => {
+    const goButton = document.querySelector(".go-button");
+    const xSelectButton = document.querySelector(".option-x");
+    const oSelectButton = document.querySelector(".option-o");
+    const easyButton = document.querySelector(".easy-ai");
+    const easierButton = document.querySelector(".easier-ai");
+
+    if (restart) {
+      gameContainer.classList.remove("onscreen");
+      homeScreen.classList.remove("onscreen");
+      displayHome(); // call recursively without paramaters to restart the game
+    }
+
+    const options = ["X", "Bot"]; //default optons
+
+    xSelectButton.addEventListener("click", () => {
+      xSelectButton.classList.add("selected");
+      oSelectButton.classList.remove("selected");
+      options[0] = "X";
+    });
+    oSelectButton.addEventListener("click", () => {
+      oSelectButton.classList.add("selected");
+      xSelectButton.classList.remove("selected");
+      options[0] = "O";
+    });
+    easyButton.addEventListener("click", () => {
+      easyButton.classList.add("selected");
+      easierButton.classList.remove("selected");
+      // options[1] = "easy bot";
+    });
+    easierButton.addEventListener("click", () => {
+      easierButton.classList.add("selected");
+      easyButton.classList.remove("selected");
+      // options[1] = "easier bot";
+    });
+
+    goButton.addEventListener("click", () => {
+      gameContainer.classList.toggle("onscreen");
+      homeScreen.classList.toggle("onscreen");
+      const players = player.createPlayers(options);
+      game.startGame(players);
+    });
   };
 
   const getPlayerInput = (players, e) => {
@@ -99,7 +142,7 @@ const UI = (() => {
       return answer;
     }
   };
-  
+
   const updateScores = (players) => {
     const xScore = document.querySelector(".x-score");
     const oScore = document.querySelector(".o-score");
@@ -112,15 +155,36 @@ const UI = (() => {
       oScore.innerHTML = players[0].wins;
     }
   };
-  // const DisplayWinScreen
+  // TODO: const DisplayWinScreen
+  const displayWinScreen = (player) => {
+    const winner = document.querySelector('.winner');
+    winner.innerHTML = player.symbol;
+    gameContainer.classList.remove("onscreen");
+    winScreen.classList.remove("onscreen");
+    const restartButton = document.querySelector('.giveup-btn2');
+    restartButton.addEventListener('click', () => {
+      winScreen.classList.add("onscreen");
+      homeScreen.classList.remove("onscreen");
+      player.resetPlayers();
+      UI.displayHome("restart");
+    })
+  };
 
-  return { askPlayerOptions, getPlayerInput, updateScores };
+  return {
+    getPlayerInput,
+    updateScores,
+    displayHome,
+    displayWinScreen,
+  };
 })();
 
 const player = (() => {
   let playerCount = 0;
   let name = "Player One";
 
+  const resetPlayers = () => {
+    playerCount = 0;
+  };
   // factory function that creates player object depending on the options provided by the player
   const createPlayer = (options) => {
     let symbol = options[0];
@@ -147,29 +211,30 @@ const player = (() => {
     return `${row}/${col}`;
   };
 
-  return { createPlayers, easyAI };
+  return { createPlayers, easyAI, resetPlayers };
 })();
 
 const game = (() => {
   const endRound = (players) => {
     const result = board.noLegalMoves();
     board.drawBoard();
-    if (result === "draw") return;
-    result === players[0].symbol
-      ? players[0].wins++
-      : players[1].wins++;
+    if (!(result === "draw")) {
+      result === players[0].symbol
+        ? players[0].wins++
+        : players[1].wins++;
+    }
 
     console.table(players);
 
     // check if the win conditions met to end the game
     if (players[0].wins === 2 || players[1].wins === 2) {
       players[0].wins > players[1].wins
-        ? console.log(`${players[0].name} wins`)
-        : console.log(`${players[1].name} wins`);
-      UI.updateScores(players);
+        ? UI.displayWinScreen(players[0])
+        : UI.displayWinScreen(players[1]);
+      
     } else {
       // else restart the game preserving wins stored in player objects
-      game.startGame(options, players);
+      game.startGame(players);
     }
   };
 
@@ -193,7 +258,7 @@ const game = (() => {
     }
   };
 
-  const startGame = (options, players) => {
+  const startGame = (players) => {
     board.clearBoard();
     UI.updateScores(players);
     board.drawBoard();
@@ -204,11 +269,16 @@ const game = (() => {
     cells.forEach((cell) => {
       cell.addEventListener("click", clickHandler);
     });
+    const giveUp = document.querySelector(".giveup-btn");
+    giveUp.addEventListener("click", () => {
+      players.pop();
+      players.pop();
+      player.resetPlayers();
+      UI.displayHome("restart");
+    });
   };
 
   return { startGame };
 })();
 
-const options = UI.askPlayerOptions();
-const players = player.createPlayers(options);
-game.startGame(options, players);
+UI.displayHome();

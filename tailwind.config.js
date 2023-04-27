@@ -10,6 +10,9 @@ export default {
         support: {
           DEFAULT: "#F1E8DA",
         },
+        bright: {
+          DEFAULT: "#D64045"
+        }
       },
     },
   },

@@ -7,14 +7,39 @@
     .cell {
         @apply bg-primary p-6 rounded-xl w-20 h-20 grid items-center justify-center content-center
         lg:w-36 lg:h-36
+        hover:border-2 hover:border-bright
         cursor-pointer
     }
     .symbol {
         @apply text-white text-5xl lg:text-8xl
     }
+    .selected {
+        @apply text-bright
+    }
+
 }
 
 * {
     font-family: 'Margarine', cursive;
     user-select: none;
+}
+
+.game-container {
+    transition: transform 2s ease;
+    transform: translateX(100vw);
+}
+.game-container.onscreen {
+    transform: translateX(0);
+}
+.home {
+    transition: transform 2s ease;
+}
+.home.onscreen {
+    transform: translateX(-100vw)
+}
+.win-screen {
+    transition: transform 2s ease;
+}
+.win-screen.onscreen {
+    transform: translateX(100vw);
 }
