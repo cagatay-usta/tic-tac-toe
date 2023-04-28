@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Tic Tac Toe</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Margarine&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-cb1dc2f9.js"></script>
+    <link rel="stylesheet" href="./assets/index-d5afa21d.css">
+  </head>
+  <body class="bg-support">
+
+    <div id="home" class="home  text-primary absolute w-screen h-screen flex flex-col items-center gap-16 lg:gap-10">
+      <h1 class="text-center text-5xl p-12 lg:text-8xl lg:p-8">TlC TAC TOE</h1>
+      <div class="symbol-options flex gap-36 text-8xl lg:gap-[30rem] lg:text-9xl">
+        <div class="option-x selected hover:text-bright">X</div>
+        <div class="option-o hover:text-bright">O</div>
+      </div>
+      <div class="go-button text-8xl lg:text-9xl hover:text-bright">GO</div>
+      <div class="robot-select text-center flex gap-12 text-6xl lg:gap-64 lg:text-8xl">
+        <div class="easy-ai hover:text-bright">Easy <br>Al</div>
+        <div class="easier-ai selected hover:text-bright">Easier <br>Al</div>
+
+      </div>
+    </div>
+
+    <div
+      class="game-container h-screen flex flex-col gap-20 justify-center items-center"
+    >
+      <div class="scores flex justify-around w-screen text-primary">
+        <div class="score text-5xl">
+          X = <span class="x-score">1</span>
+        </div>
+        <div class="score text-5xl">
+          O = <span class="o-score">2</span>
+        </div>
+      </div>
+      <div class="board grid grid-cols-3 grid-rows-3 gap-4">
+        <div class="cell" data-cellid="0/0">
+          <span id="0" class="symbol">X</span>
+        </div>
+        <div class="cell" data-cellid="0/1">
+          <span id="1" class="symbol">O</span>
+        </div>
+        <div class="cell" data-cellid="0/2">
+          <span id="2" class="symbol">O</span>
+        </div>
+        <div class="cell" data-cellid="1/0">
+          <span id="3" class="symbol">O</span>
+        </div>
+        <div class="cell" data-cellid="1/1">
+          <span id="4" class="symbol">X</span>
+        </div>
+        <div class="cell" data-cellid="1/2">
+          <span id="5" class="symbol">O</span>
+        </div>
+        <div class="cell" data-cellid="2/0">
+          <span id="6" class="symbol"> </span>
+        </div>
+        <div class="cell" data-cellid="2/1">
+          <span id="7" class="symbol"> </span>
+        </div>
+        <div class="cell" data-cellid="2/2">
+          <span id="8" class="symbol">X</span>
+        </div>
+      </div>
+      <button class="giveup-btn text-6xl text-primary hover:text-bright">
+        Give Up
+      </button>
+    </div>
+
+    <div class="absolute onscreen top-0 h-screen w-screen win-screen text-center flex flex-col gap-12 justify-center items-center">
+      <h1 class="text-9xl text-primary"><span class="winner">X</span><br>WON</h1>
+      <button class="giveup-btn2 text-8xl text-primary hover:text-bright">
+        Restart
+      </button>
+
+    </div>
+ 
+  </body>
+</html>
